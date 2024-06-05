@@ -9,41 +9,49 @@ function documentClick(e) {
 		document.documentElement.classList.toggle('menu-open');
 	}
 }
+//========================================================================================================================================================
+const animatedElements = document.querySelectorAll('.images__animated-element');
 
-const animatedLinks = document.querySelectorAll('.animated-link');
-
-animatedLinks.forEach(link => {
-	link.addEventListener('click', function (event) {
-		event.preventDefault();
-
-		setTimeout(() => {
-			window.location.href = this.href;
-		}, 150);
+const observer = new IntersectionObserver((entries) => {
+	entries.forEach(entry => {
+		if (entry.isIntersecting) {
+			entry.target.classList.add('in-view');
+		} else {
+			entry.target.classList.remove('in-view');
+		}
 	});
+});
+
+animatedElements.forEach(element => {
+	observer.observe(element);
 });
 
 document.addEventListener('mousemove', function (event) {
 	const mouseX = event.clientX;
 	const mouseY = event.clientY;
 
-	const animatedElements = document.querySelectorAll('.images__animated-element');
+	const inViewElements = document.querySelectorAll('.images__animated-element.in-view');
 
-	animatedElements.forEach(function (animatedElement) {
+	inViewElements.forEach(function (animatedElement) {
 		const rect = animatedElement.getBoundingClientRect();
 		const deltaX = ((mouseX - rect.left) / rect.width - 0) * 2;
 		const deltaY = ((mouseY - rect.top) / rect.height - 0) * 2;
 
 		const scaleFactor = 1 + Math.abs(deltaX) * 0.002 + Math.abs(deltaY) * 0.002;
-		animatedElement.style.transform = `scale(${scaleFactor})`;
+		const translateX = deltaX * 2; // регулируем множитель для движения по X
+		const translateY = deltaY * 2; // регулируем множитель для движения по Y
+
+		animatedElement.style.transform = `scale(${scaleFactor}) translate(${translateX}px, ${translateY}px)`;
 	});
 });
 
 document.addEventListener('mouseout', function () {
-	const animatedElements = document.querySelectorAll('.images__animated-element');
-	animatedElements.forEach(function (animatedElement) {
+	const inViewElements = document.querySelectorAll('.images__animated-element.in-view');
+	inViewElements.forEach(function (animatedElement) {
 		animatedElement.style.transform = 'none';
 	});
 });
+//========================================================================================================================================================
 
 const swiper = new Swiper('.slider-clients', {
 	loop: true,
